@@ -14,7 +14,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout source repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v6
         with:
           ref: ${{ github.event.inputs.source_branch }}
           repository: SprintRay-Software/AI_Crown_CPU.git
@@ -22,7 +22,7 @@ jobs:
           path: source
           
       - name: Checkout target repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v6
         with:
           path: target
           token: ${{ secrets.TARGET_ACCESS_TOKEN }}  
