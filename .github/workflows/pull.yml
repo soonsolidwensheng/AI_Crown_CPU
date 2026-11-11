@@ -41,7 +41,7 @@ jobs:
       - name: Sync files with exclusions
         run: |
           #sudo rsync -av --delete --exclude='Dockerfile' --exclude='.*'    source/ target/   
-          sudo rsync -av --delete  --exclude='.*'  source/ target/   
+          sudo rsync -av --delete  --exclude='Dockerfile' --exclude='.*'  source/ target/   
       - name: Commit and push changes
         run: |
           cd target
