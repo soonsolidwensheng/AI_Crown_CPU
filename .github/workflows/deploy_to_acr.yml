@@ -1,0 +1,75 @@
+name: Deploy to Acr
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version number for the Docker image'
+        required: true
+      skip_image:
+        description: 'Skip image build and push (true/false)'
+        required: false
+        default: 'false'
+env:
+  REGISTRY: registry.cn-beijing.aliyuncs.com 
+  NAMESPACE: studio_ai # ACR命名空间
+  IMAGE_NAME: ai_crown
+jobs:
+  deploy-to-dev:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+          
+      - name: Login to Alibaba Cloud ACR
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ secrets.ACR_USERNAME }}
+          password: ${{ secrets.ACR_PASSWORD }}
+          
+      - name: Build Docker image
+        if: ${{ inputs.skip_image != 'true' }}
+        run: |
+          VERSION=${{ github.event.inputs.version }}
+          ACR_URI=${{ env.REGISTRY }}/${{ env.NAMESPACE }}/${{ env.IMAGE_NAME }}
+
+          echo "Building Docker image with tag $ACR_URI:$VERSION"
+          docker build -t $ACR_URI:$VERSION .
+          
+      - name: Push Docker image to ACR
+        if: ${{ inputs.skip_image != 'true' }}
+        run: |
+          VERSION=${{ github.event.inputs.version }}
+          ACR_URI=${{ env.REGISTRY }}/${{ env.NAMESPACE }}/${{ env.IMAGE_NAME }}
+          
+          docker login -u "${{secrets.ACR_USERNAME}}" -p "${{secrets.ACR_PASSWORD}}" ${{ env.REGISTRY }}
+          echo "Pushing Docker image with tag $ACR_URI:$VERSION"
+          docker push $ACR_URI:$VERSION
+                    
+      # - name: Setup Node.js
+      #   uses: actions/setup-node@v3
+      #   with:
+      #     node-version: '16'
+      
+      # - name: Install Serverless Devs
+      #   run: sudo npm install @serverless-devs/s -g
+       
+      # - name: Configure Alibaba Cloud Credentials
+      #   run: s config add --AccessKeyID ${{ secrets.ALICLOUD_ACCESS_KEY }} --AccessKeySecret ${{ secrets.ALICLOUD_SECRET }} -a default
+      
+            
+      # # 部署到函数计算3.0
+      # - name: Deploy to FC 3.0
+      #   run: |
+      #     VERSION=${{ github.event.inputs.version }}
+      #     ACR_URI=${{ env.REGISTRY }}/${{ env.NAMESPACE }}/${{ env.IMAGE_NAME }}
+      #     s cli fc3 deploy -p '{
+      #       "region": "cn-beijing",
+      #       "functionName": "ai_crown_acr",
+      #       "customContainerConfig": {
+      #         "image": "$ACR_URI:$VERSION"
+      #       }
+      #     }' -a default
+     
