@@ -143,7 +143,7 @@ def _process_url_event(event: dict[str, Any]) -> dict[str, Any]:
     try:
         parsed_url = urlparse(target_url)
         query_params = parse_qs(parsed_url.query)
-        content_type = query_params.get("Content-Type", ["application/json"])[0]
+        content_type = query_params.get("Content-Type", ["binary/octet-stream"])[0]
         response = requests.put(
             target_url,
             json=result,
