@@ -94,10 +94,10 @@ def _process_url_event(event):
         )
 
     # -------------------- 修改开始 --------------------
-    # 从 target_url 中提取 Content-Type 参数，若无则默认为 application/json
+    # 从 target_url 中提取 Content-Type 参数，若无则默认为 binary/octet-stream
     parsed_url = urlparse(target_url)
     query_params = parse_qs(parsed_url.query)
-    content_type = query_params.get('Content-Type', ['application/json'])[0]
+    content_type = query_params.get('Content-Type', ['binary/octet-stream'])[0]
     # -------------------- 修改结束 --------------------
 
     try:
